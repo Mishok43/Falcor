@@ -9,6 +9,7 @@ target_sources(PathTracer PRIVATE
     Params.slang
     PathState.slang
     PathTracer.slang
+    MLData.slang
     PathTracer.cpp
     PathTracer.h
     PathTracerNRD.slang

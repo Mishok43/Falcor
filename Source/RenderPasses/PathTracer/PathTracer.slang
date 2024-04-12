@@ -84,6 +84,8 @@ struct PathTracer
     NRDBuffers outputNRD;                           ///< Output NRD data.
 
     RWTexture2D<float4> outputColor;                ///< Output color buffer if kSamplesPerPixel == 1.
+    RWStructuredBuffer<MLDataOutput> outputMLData;
+
 
     /*******************************************************************
                                 Static members
@@ -1022,6 +1024,30 @@ struct PathTracer
         // Generate the next path segment or terminate.
         bool valid = generateScatterRay(sd, mi, path);
 
+        #if 1
+            if (path.getVertexIndex() == 1)
+            {
+                path.mlData.fill();
+                path.mlData.setPrimaryWorldPos(sd.posW);
+                path.mlData.setPrimaryScatterDir(path.dir);
+                //path.mlData.setPrimaryScatterDir(float3(10.0f, 10.0f, 10.0f));
+
+
+                // if (valid || all(path.thp == 0))
+                // {
+                //     path.mlData.setPrimaryScatterDir(path.dir);
+                // }
+                // else
+                // {
+                //     path.mlData.setPrimaryScatterDir(float3(0.0f, 0.0f, 0.0f));
+                // }
+
+                path.mlData.setPrimaryThp(path.thp);
+                path.mlData.setPrimaryRadiance(path.L);
+                path.mlData.setIsDelta(path.isDelta());
+            }
+        #endif
+
         // Output guide data.
         if (path.getVertexIndex() == 1)
         {
@@ -1164,10 +1190,12 @@ struct PathTracer
         const uint2 pixel = path.getPixel();
         const uint outIdx = params.getSampleOffset(pixel, sampleOffset) + path.getSampleIdx();
 
+
         if (kSamplesPerPixel == 1)
         {
             // Write color directly to frame buffer.
             outputColor[pixel] = float4(path.L, 1.f);
+            outputMLData[outIdx] = path.mlData.generateOutput(path.L);
         }
         else
         {

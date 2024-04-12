@@ -132,7 +132,7 @@ endif()
 
 include(CheckLanguage)
 check_language(CUDA)
-if(CMAKE_CUDA_COMPILER)
+if(1)
     message(STATUS "Enabling CUDA support.")
     enable_language(CUDA)
     find_package(CUDAToolkit REQUIRED)

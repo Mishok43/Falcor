@@ -58,6 +58,7 @@ struct PathPayload
 
     PackedHitInfo hit;
     GuideData guideData;
+    MLData mlData;
     InteriorList interiorList;  ///< Interior list. Keeping track of a stack of materials with medium properties. The size depends on the config (4B/item).
     SampleGenerator sg;         ///< Sample generator state. Typically 4-16B.
 
@@ -82,6 +83,11 @@ struct PathPayload
 
         p.hit = path.hit.getData();
         p.guideData = path.guideData;
+
+        #if 1
+        p.mlData = path.mlData;
+        #endif
+
         p.interiorList = path.interiorList;
         p.sg = path.sg;
 
@@ -94,6 +100,11 @@ struct PathPayload
 
         path.origin = asfloat(p.packed[0].xyz);
         path.id = p.packed[0].w;
+
+
+        #if 1
+        path.mlData = p.mlData;
+        #endif
 
         path.dir = asfloat(p.packed[1].xyz);
         path.flagsAndVertexIndex = p.packed[1].w;

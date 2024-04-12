@@ -675,6 +675,7 @@ bool RenderGraph::onKeyEvent(const KeyboardEvent& keyEvent)
     return mpExe ? mpExe->onKeyEvent(keyEvent) : false;
 }
 
+
 void RenderGraph::onHotReload(HotReloadFlags reloaded)
 {
     if (mpExe)
@@ -761,6 +762,8 @@ FALCOR_SCRIPT_BINDING(RenderGraph)
     renderGraph.def(
         "removeEdge", pybind11::overload_cast<const std::string&, const std::string&>(&RenderGraph::removeEdge), "src"_a, "dst"_a
     );
+
+    
     renderGraph.def("markOutput", &RenderGraph::markOutput, "name"_a, "mask"_a = TextureChannelFlags::RGB);
     renderGraph.def("unmarkOutput", &RenderGraph::unmarkOutput, "name"_a);
     renderGraph.def("getPass", &RenderGraph::getPass, "name"_a);

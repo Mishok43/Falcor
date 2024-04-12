@@ -68,6 +68,9 @@ public:
 
     static void registerBindings(pybind11::module& m);
 
+    const ref<Buffer>& getMLData() const { return mpMLData; }
+    void setMLData(const ref<Buffer>& buf) { mpMLData = buf; }
+
 private:
     struct TracePass
     {
@@ -176,7 +179,7 @@ private:
     bool                            mOutputGuideData = false;   ///< True if guide data should be generated as outputs.
     bool                            mOutputNRDData = false;     ///< True if NRD diffuse/specular data should be generated as outputs.
     bool                            mOutputNRDAdditionalData = false;   ///< True if NRD data from delta and residual paths should be generated as designated outputs rather than being included in specular NRD outputs.
-
+    
     ref<ComputePass>                mpGeneratePaths;            ///< Fullscreen compute pass generating paths starting at primary hits.
     ref<ComputePass>                mpResolvePass;              ///< Sample resolve pass.
     ref<ComputePass>                mpReflectTypes;             ///< Helper for reflecting structured buffer types.
@@ -193,4 +196,6 @@ private:
     ref<Buffer>                     mpSampleNRDPrimaryHitNeeOnDelta;///< Compact per-sample NEE on delta primary vertices data.
     ref<Buffer>                     mpSampleNRDEmission;        ///< Compact per-sample NRD emission data.
     ref<Buffer>                     mpSampleNRDReflectance;     ///< Compact per-sample NRD reflectance data.
+
+    ref<Buffer>                     mpMLData;
 };

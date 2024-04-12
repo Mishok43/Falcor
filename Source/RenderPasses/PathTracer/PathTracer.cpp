@@ -51,6 +51,8 @@ namespace
         { kInputSampleCount,    "gSampleCount",     "Sample count buffer (integer format)", true /* optional */, ResourceFormat::R8Uint },
     };
 
+    const std::string kOutputML = "ml";
+
     const std::string kOutputColor = "color";
     const std::string kOutputAlbedo = "albedo";
     const std::string kOutputSpecularAlbedo = "specularAlbedo";
@@ -88,6 +90,7 @@ namespace
         { kOutputReflectionPosW,                            "",     "Output reflection pos (world space)", true /* optional */, ResourceFormat::RGBA32Float },
         { kOutputRayCount,                                  "",     "Per-pixel ray count", true /* optional */, ResourceFormat::R32Uint },
         { kOutputPathLength,                                "",     "Per-pixel path length", true /* optional */, ResourceFormat::R32Uint },
+
         // NRD outputs
         { kOutputNRDDiffuseRadianceHitDist,                 "",     "Output demodulated diffuse color (linear) and hit distance", true /* optional */, ResourceFormat::RGBA32Float },
         { kOutputNRDSpecularRadianceHitDist,                "",     "Output demodulated specular color (linear) and hit distance", true /* optional */, ResourceFormat::RGBA32Float },
@@ -167,6 +170,8 @@ void PathTracer::registerBindings(pybind11::module& m)
         [](const PathTracer* pt) { return pt->mParams.fixedSeed; },
         [](PathTracer* pt, uint32_t value) { pt->mParams.fixedSeed = value; }
     );
+
+    pass.def_property("mlData", &PathTracer::getMLData, &PathTracer::setMLData);
 }
 
 PathTracer::PathTracer(ref<Device> pDevice, const Properties& props)
@@ -702,7 +707,13 @@ PathTracer::TracePass::TracePass(ref<Device> pDevice, const std::string& name, c
     desc.addShaderLibrary(kTracePassFilename);
     if (pDevice->getType() == Device::Type::D3D12 && useSER)
         desc.addCompilerArguments({ "-Xdxc", "-enable-lifetime-markers" });
-    desc.setMaxPayloadSize(160); // This is conservative but the required minimum is 140 bytes.
+
+    if (1)
+        desc.setMaxPayloadSize(220); // This is conservative but the required minimum is 140 bytes.
+    else
+        desc.setMaxPayloadSize(160); // This is conservative but the required minimum is 140 bytes.
+    
+
     desc.setMaxAttributeSize(pScene->getRaytracingMaxAttributeSize());
     desc.setMaxTraceRecursionDepth(1);
     if (!pScene->hasProceduralGeometry()) desc.setRtPipelineFlags(RtPipelineFlags::SkipProceduralPrimitives);
@@ -1112,6 +1123,8 @@ void PathTracer::bindShaderData(const ShaderVar& var, const RenderData& renderDa
     var["viewDir"] = pViewDir; // Can be nullptr
     var["sampleCount"] = pSampleCount; // Can be nullptr
     var["outputColor"] = renderData.getTexture(kOutputColor);
+    if (var.hasMember("outputMLData"))
+        var["outputMLData"] = mpMLData;
 
     if (useLightSampling && mpEmissiveSampler)
     {
@@ -1331,6 +1344,7 @@ void PathTracer::tracePass(RenderContext* pRenderContext, const RenderData& rend
     // Full screen dispatch.
     mpScene->raytrace(pRenderContext, tracePass.pProgram.get(), tracePass.pVars, uint3(mParams.frameDim, 1));
 }
+
 
 void PathTracer::resolvePass(RenderContext* pRenderContext, const RenderData& renderData)
 {

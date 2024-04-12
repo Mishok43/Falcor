@@ -31,6 +31,7 @@ __exported import Utils.Math.Ray;
 __exported import Utils.Sampling.SampleGenerator;
 __exported import Rendering.Materials.InteriorList;
 __exported import GuideData;
+__exported import MLData;
 
 static const uint kMaxRejectedHits = 16; // Maximum number of rejected hits along a path. The path is terminated if the limit is reached to avoid getting stuck in pathological cases.
 
@@ -42,6 +43,11 @@ static const uint kVertexIndexBitCount = 10u;
 static const uint kVertexIndexBitMask = (1u << kVertexIndexBitCount) - 1u;
 static const uint kPathFlagsBitCount = 32u - kVertexIndexBitCount;
 static const uint kPathFlagsBitMask = ((1u << kPathFlagsBitCount) - 1u) << kVertexIndexBitCount;
+
+#ifndef MLDataGenerate
+#define MLDataGenerate
+#endif
+
 
 /** Path flags. The path flags are currently stored in kPathFlagsBitCount bits.
 */
@@ -100,6 +106,11 @@ struct PathState
     float3      L;                      ///< Accumulated path contribution.
 
     GuideData   guideData;              ///< Denoiser guide data.
+
+#ifdef MLDataGenerate
+    MLData      mlData;
+#endif
+
     InteriorList interiorList;          ///< Interior list. Keeping track of a stack of materials with medium properties.
     SampleGenerator sg;                 ///< Sample generator state. Typically 4-16B.
 
