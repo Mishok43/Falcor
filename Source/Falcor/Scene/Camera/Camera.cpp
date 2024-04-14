@@ -233,6 +233,7 @@ namespace Falcor
         togglePersistentViewMatrix(true);
     }
 
+
     void Camera::togglePersistentProjectionMatrix(bool persistent)
     {
         mEnablePersistentProjMat = persistent;
@@ -398,6 +399,7 @@ namespace Falcor
         d["focalLength"] = getFocalLength();
         d["focalDistance"] = getFocalDistance();
         d["apertureRadius"] = getApertureRadius();
+        d["useHemisphericalCamera"] = isHemisphericalCamera();
         std::cout << pybind11::str(d) << std::endl;
 
         fmt::print("camera = Camera('{}')\n", getName());
@@ -409,6 +411,7 @@ namespace Falcor
         fmt::print("camera.apertureRadius = {:.9g}\n", getApertureRadius());
         fmt::print("camera.nearPlane = {:.9g}\n", getNearPlane());
         fmt::print("camera.farPlane = {:.9g}\n", getFarPlane());
+        fmt::print("camera.useHemisphericalCamera = {:.9g}\n", isHemisphericalCamera());
         std::cout.flush();
     }
 
@@ -430,6 +433,7 @@ namespace Falcor
         camera.def_property("ISOSpeed", &Camera::getISOSpeed, &Camera::setISOSpeed);
         camera.def_property("nearPlane", &Camera::getNearPlane, &Camera::setNearPlane);
         camera.def_property("farPlane", &Camera::getFarPlane, &Camera::setFarPlane);
+        camera.def_property("useHemisphericalCamera", &Camera::isHemisphericalCamera, &Camera::setHemisphericalCamera);
         camera.def_property(kPosition.c_str(), &Camera::getPosition, &Camera::setPosition);
         camera.def_property(kTarget.c_str(), &Camera::getTarget, &Camera::setTarget);
         camera.def_property(kUp.c_str(), &Camera::getUpVector, &Camera::setUpVector);

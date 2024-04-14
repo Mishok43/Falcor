@@ -1030,6 +1030,14 @@ struct PathTracer
                 path.mlData.fill();
                 path.mlData.setPrimaryWorldPos(sd.posW);
                 path.mlData.setPrimaryScatterDir(path.dir);
+
+
+                BSDFProperties props = mi.getProperties(sd);
+                float3 color = props.specularReflectionAlbedo+props.diffuseReflectionAlbedo;
+
+
+                path.mlData.setPrimaryColor(color);
+                path.mlData.setPrimaryNormal(sd.frame.N);
                 //path.mlData.setPrimaryScatterDir(float3(10.0f, 10.0f, 10.0f));
 
 

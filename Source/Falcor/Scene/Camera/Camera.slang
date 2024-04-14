@@ -45,6 +45,9 @@ struct Camera
     */
     Ray computeRayPinhole(uint2 pixel, uint2 frameDim, bool applyJitter = true)
     {
+        if (data.useHemisphericalCamera != 0) {
+            return computeRayHemispherical(pixel, frameDim, applyJitter);
+        }
         Ray ray;
 
         // Compute the normalized ray direction assuming a pinhole camera.
@@ -56,6 +59,57 @@ struct Camera
         ray.tMax = data.farZ * invCos;
 
         return ray;
+    }
+
+    Ray computeRayHemispherical(uint2 pixel, uint2 frameDim, bool applyJitter = true)
+    {
+        Ray ray;
+
+        // Compute the normalized ray direction assuming a hemispherical camera.
+        ray.origin = data.posW;
+        ray.dir = normalize(computeNonNormalizedRayDirHemispherical(pixel, frameDim, applyJitter));
+        ray.tMin = 0.0;
+        ray.tMax = 100000000;
+
+        return ray;
+    }
+
+    float3 computeNonNormalizedRayDirHemispherical(uint2 pixel, uint2 frameDim, bool applyJitter = true)
+    {
+        // Compute sample position in screen space in [0,1] with origin at the top-left corner.
+        // The camera jitter offsets the sample by +-0.5 pixels from the pixel center.
+        float2 p = (pixel + float2(0.5f, 0.5f)) / frameDim;
+        if (applyJitter) p += float2(-data.jitterX, data.jitterY);
+        float2 ndc = float2(2, -2) * p + float2(-1, 1);
+
+        // Project the hemisphere onto the hemi-octahedron,
+        // and then into the xy plane
+        float2 oct_position = float32x3_to_hemioct(float3(ndc, 1.0 - abs(ndc.x) - abs(ndc.y)));
+
+        // Rotate and scale the center diamond to the unit square
+        float2 p_rotated = float2(oct_position.x + oct_position.y, oct_position.x - oct_position.y) * 0.5f;
+
+        // Derive the non-normalized ray direction assuming a hemispherical camera.
+        float3 rayDir = hemioct_to_float32x3(p_rotated);
+
+        // Transform the ray direction into the camera's coordinate space
+        return rayDir.x * data.cameraU + rayDir.y * data.cameraV + rayDir.z * data.cameraW;
+    }
+
+    // Assume normalized input on +Z hemisphere.
+    // Output is on [-1, 1].
+    float2 float32x3_to_hemioct(in float3 v) {
+        // Project the hemisphere onto the hemi-octahedron,
+        // and then into the xy plane
+        float2 p = v.xy * (1.0 / (abs(v.x) + abs(v.y) + v.z));
+        // Rotate and scale the center diamond to the unit square
+        return float2(p.x + p.y, p.x - p.y);
+    }
+    float3 hemioct_to_float32x3(float2 e) {
+        // Rotate and scale the unit square back to the center diamond
+        float2 temp = float2(e.x + e.y, e.x - e.y) * 0.5;
+        float3 v = float3(temp, 1.0 - abs(temp.x) - abs(temp.y));
+        return normalize(v);
     }
 
     /** Computes the primary ray's direction, non-normalized assuming pinhole camera model.

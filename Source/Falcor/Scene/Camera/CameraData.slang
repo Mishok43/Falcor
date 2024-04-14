@@ -63,8 +63,8 @@ struct CameraData
     float    focalDistance          = 10000.0f;                 ///< Camera focal distance in scene units.
     float    apertureRadius         = 0.0f;                     ///< Camera aperture radius in scene units.
     float    shutterSpeed           = 0.004f;                   ///< Camera shutter speed in seconds.
-    float    ISOSpeed               = 100.0f;                   ///< Camera film speed based on ISO standards.
-    float   _padding1;
+    float    ISOSpeed = 100.0f;                                    ///< Camera film speed based on ISO standards.
+    int      useHemisphericalCamera = 0;                                 // additional toggle parameter for hemispherical camera
     float   _padding2;
 };
 

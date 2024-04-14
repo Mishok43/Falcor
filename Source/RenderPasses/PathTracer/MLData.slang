@@ -38,12 +38,16 @@ struct MLDataOutput
     float3 dir;
     float3 thp;
     float3 worldpos;
+    float3 normal;
+    float3 color;
 };
 
 
 struct MLData
 {
     float3 primaryWorldPos;
+    float3 primaryNormal;
+    float3 primaryColor;
     float3 primaryScatterRay;
     float3 primaryThp;
     float3 primaryRadiance;
@@ -52,6 +56,8 @@ struct MLData
 
     [mutating] void setPrimaryWorldPos(float3 pos) { primaryWorldPos = pos; }
     [mutating] void setPrimaryThp(float3 thp) { primaryThp= thp; }
+    [mutating] void setPrimaryNormal(float3 n) { primaryNormal= n; }
+    [mutating] void setPrimaryColor(float3 c) { primaryColor= c; }
     [mutating] void setIsDelta(bool isDelta) { isDelta = bDelta; }
     [mutating] void setPrimaryRadiance(float3 rad) { primaryRadiance= rad; }
     [mutating] void setPrimaryScatterDir(float3 dir) {
@@ -74,6 +80,8 @@ struct MLData
         primaryScatterRay = float3(10.0f, 10.0f, 10.0f);
         primaryThp = float3(1.0f, 1.0f, 1.0f);
         primaryRadiance = float3(0.0f, 0.0f, 0.0f);
+        primaryNormal = float3(0.0f, 0.0f, 0.0f);
+        primaryColor = float3(0.0f, 0.0f, 0.0f);
         bFilled = false;
     }
 
@@ -88,6 +96,8 @@ struct MLData
         out.dir = primaryScatterRay;
         out.thp = primaryThp;
         out.worldpos = primaryWorldPos;
+        out.normal = primaryNormal;
+        out.color = primaryColor;
 
         // if(length(out.dir) == 0.0)
         //     out.dir = float3(10.0f, 10.0f, 10.0f);

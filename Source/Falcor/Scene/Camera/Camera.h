@@ -147,6 +147,10 @@ namespace Falcor
         */
         void setUpVector(const float3& up) { mData.up = up; mDirty = true; }
 
+        void setHemisphericalCamera(bool isHemispherical) { mData.useHemisphericalCamera=true; mDirty = true; }
+
+        const bool isHemisphericalCamera() const {return mData.useHemisphericalCamera;}
+
         /** Set the camera's world space target position.
         */
         void setTarget(const float3& target) { mData.target = target; mDirty = true; }
