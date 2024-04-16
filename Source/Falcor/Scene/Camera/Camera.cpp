@@ -434,6 +434,11 @@ namespace Falcor
         camera.def_property("nearPlane", &Camera::getNearPlane, &Camera::setNearPlane);
         camera.def_property("farPlane", &Camera::getFarPlane, &Camera::setFarPlane);
         camera.def_property("useHemisphericalCamera", &Camera::isHemisphericalCamera, &Camera::setHemisphericalCamera);
+
+
+        camera.def_property_readonly("cameraU", &Camera::getCameraU);
+        camera.def_property_readonly("cameraV", &Camera::getCameraV);
+        camera.def_property_readonly("cameraW", &Camera::getCameraW);
         camera.def_property(kPosition.c_str(), &Camera::getPosition, &Camera::setPosition);
         camera.def_property(kTarget.c_str(), &Camera::getTarget, &Camera::setTarget);
         camera.def_property(kUp.c_str(), &Camera::getUpVector, &Camera::setUpVector);

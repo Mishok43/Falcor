@@ -41,6 +41,8 @@ extern "C" FALCOR_API_EXPORT void registerPlugin(Falcor::PluginRegistry& registr
     registry.registerClass<RenderPass, GBufferRT>();
     registry.registerClass<RenderPass, VBufferRaster>();
     registry.registerClass<RenderPass, VBufferRT>();
+
+    ScriptBindings::registerBinding(VBufferRT::registerBindings);
 }
 
 namespace

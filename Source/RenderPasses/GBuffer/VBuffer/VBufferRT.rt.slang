@@ -34,6 +34,7 @@ import VBufferRT;
 
 ConstantBuffer<VBufferRT> gVBufferRT;
 
+
 struct RayData
 {
     // TODO: Passing in an empty payload struct doesn't work. Declare a dummy variable so that the compiler doesn't remove the declaration.

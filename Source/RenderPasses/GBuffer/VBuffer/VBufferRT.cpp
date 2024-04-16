@@ -72,6 +72,21 @@ VBufferRT::VBufferRT(ref<Device> pDevice, const Properties& props) : GBufferBase
     mpSampleGenerator = SampleGenerator::create(mpDevice, SAMPLE_GENERATOR_DEFAULT);
 }
 
+//extern "C" FALCOR_API_EXPORT void registerPlugin(Falcor::PluginRegistry& registry)
+//{
+//    registry.registerClass<RenderPass, VBufferRT>();
+//    ScriptBindings::registerBinding(VBufferRT::registerBindings);
+//}
+
+
+
+void VBufferRT::registerBindings(pybind11::module& m)
+{
+    pybind11::class_<VBufferRT, RenderPass, ref<VBufferRT>> pass(m, "VBufferRT");
+    
+    pass.def_property("mlRaysData", &VBufferRT::getMLRaysData, &VBufferRT::setMLRaysData);
+}
+
 RenderPassReflection VBufferRT::reflect(const CompileData& compileData)
 {
     RenderPassReflection reflector;
@@ -298,6 +313,7 @@ DefineList VBufferRT::getShaderDefines(const RenderData& renderData) const
     // For optional I/O resources, set 'is_valid_<name>' defines to inform the program of which ones it can access.
     // TODO: This should be moved to a more general mechanism using Slang.
     defines.add(getValidResourceDefines(kVBufferExtraChannels, renderData));
+    defines.add("is_valid_outputMLRaysData", std::to_string(int(mpMLRaysData != nullptr)));
     return defines;
 }
 
@@ -317,4 +333,7 @@ void VBufferRT::bindShaderData(const ShaderVar& var, const RenderData& renderDat
     };
     for (const auto& channel : kVBufferExtraChannels)
         bind(channel);
+
+    if (var.hasMember("outputMLRaysData") && mpMLRaysData!=nullptr)
+        var["outputMLRaysData"] = mpMLRaysData;
 }

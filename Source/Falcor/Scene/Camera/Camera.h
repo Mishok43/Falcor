@@ -129,6 +129,10 @@ namespace Falcor
 
         /** Get the camera's world space position.
         */
+        const float3& getCameraW() const {return mData.cameraW;}
+        const float3& getCameraU() const {return mData.cameraU;}
+        const float3& getCameraV() const {return mData.cameraV;}
+
         const float3& getPosition() const { return mData.posW; }
 
         /** Get the camera's world space up vector.
@@ -147,7 +151,7 @@ namespace Falcor
         */
         void setUpVector(const float3& up) { mData.up = up; mDirty = true; }
 
-        void setHemisphericalCamera(bool isHemispherical) { mData.useHemisphericalCamera=true; mDirty = true; }
+        void setHemisphericalCamera(bool isHemispherical) { mData.useHemisphericalCamera=isHemispherical; mDirty = true; }
 
         const bool isHemisphericalCamera() const {return mData.useHemisphericalCamera;}
 

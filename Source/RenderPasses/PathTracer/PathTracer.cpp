@@ -1123,7 +1123,7 @@ void PathTracer::bindShaderData(const ShaderVar& var, const RenderData& renderDa
     var["viewDir"] = pViewDir; // Can be nullptr
     var["sampleCount"] = pSampleCount; // Can be nullptr
     var["outputColor"] = renderData.getTexture(kOutputColor);
-    if (var.hasMember("outputMLData"))
+    if (var.hasMember("outputMLData") && mpMLData != nullptr)
         var["outputMLData"] = mpMLData;
 
     if (useLightSampling && mpEmissiveSampler)
@@ -1327,6 +1327,7 @@ void PathTracer::tracePass(RenderContext* pRenderContext, const RenderData& rend
     tracePass.pProgram->addDefine("OUTPUT_GUIDE_DATA", mOutputGuideData ? "1" : "0");
     tracePass.pProgram->addDefine("OUTPUT_NRD_DATA", mOutputNRDData ? "1" : "0");
     tracePass.pProgram->addDefine("OUTPUT_NRD_ADDITIONAL_DATA", mOutputNRDAdditionalData ? "1" : "0");
+    tracePass.pProgram->addDefine("OUTPUT_ML_DATA", mpMLData != nullptr ? "1" : "0");
 
     // Bind global resources.
     auto var = tracePass.pVars->getRootVar();

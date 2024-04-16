@@ -37,12 +37,19 @@ RWTexture2D<float2> gMotionVector;
 RWTexture2D<float4> gViewW;
 RWTexture2D<uint> gTime;
 RWTexture2D<float> gMask;
+RWStructuredBuffer<MLRaysDataOutput> outputMLRaysData;
 
 #define is_valid(name) (is_valid_##name != 0)
 
 #if !defined(COMPUTE_DEPTH_OF_FIELD) || !defined(USE_ALPHA_TEST) || !defined(RAY_FLAGS)
 #error "Not all defines are set!"
 #endif
+
+struct MLRaysDataOutput
+{
+    float3 pos;
+    float3 dir;
+};
 
 struct VBufferRT
 {
@@ -55,15 +62,28 @@ struct VBufferRT
 
     Ray generateRay(uint2 pixel)
     {
+        Ray r;
         if (kComputeDepthOfField)
         {
             SampleGenerator sg = SampleGenerator(pixel, frameCount);
-            return gScene.camera.computeRayThinlens(pixel, frameDim, sampleNext2D(sg));
+            r = gScene.camera.computeRayThinlens(pixel, frameDim, sampleNext2D(sg));
         }
         else
         {
-            return gScene.camera.computeRayPinhole(pixel, frameDim);
+            r = gScene.camera.computeRayPinhole(pixel, frameDim);
         }
+
+        if (is_valid(outputMLRaysData))
+        {
+            uint id = pixel.x + pixel.y * frameDim.x;
+
+            MLRaysDataOutput out;
+            out.dir = r.dir;
+            out.pos = r.origin;
+            outputMLRaysData[id] = out;
+        }
+
+        return r;
     }
 
     void writeHit(uint2 pixel, float3 rayOrigin, float3 rayDir, const HitInfo hit)

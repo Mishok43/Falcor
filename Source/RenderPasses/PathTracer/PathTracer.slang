@@ -1024,11 +1024,11 @@ struct PathTracer
         // Generate the next path segment or terminate.
         bool valid = generateScatterRay(sd, mi, path);
 
-        #if 1
+        #if OUTPUT_ML_DATA
             if (path.getVertexIndex() == 1)
             {
-                path.mlData.fill();
                 path.mlData.setPrimaryWorldPos(sd.posW);
+
                 path.mlData.setPrimaryScatterDir(path.dir);
 
 
@@ -1037,6 +1037,7 @@ struct PathTracer
 
 
                 path.mlData.setPrimaryColor(color);
+                path.mlData.setPrimaryRoughness(props.roughness);
                 path.mlData.setPrimaryNormal(sd.frame.N);
                 //path.mlData.setPrimaryScatterDir(float3(10.0f, 10.0f, 10.0f));
 
@@ -1203,7 +1204,11 @@ struct PathTracer
         {
             // Write color directly to frame buffer.
             outputColor[pixel] = float4(path.L, 1.f);
-            outputMLData[outIdx] = path.mlData.generateOutput(path.L);
+
+            #if OUTPUT_ML_DATA
+            uint outputid = pixel.x + pixel.y * params.frameDim.x;
+            outputMLData[outputid] = path.mlData.generateOutput(path.L);
+            #endif
         }
         else
         {

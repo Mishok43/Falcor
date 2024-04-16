@@ -53,6 +53,12 @@ public:
     Properties getProperties() const override;
     void setScene(RenderContext* pRenderContext, const ref<Scene>& pScene) override;
 
+    const ref<Buffer>& getMLRaysData() const { return mpMLRaysData; }
+    void setMLRaysData(const ref<Buffer>& buf) { mpMLRaysData = buf; }
+    
+
+    static void registerBindings(pybind11::module& m);
+
 private:
     void parseProperties(const Properties& props) override;
 
@@ -81,5 +87,7 @@ private:
         ref<RtProgramVars> pVars;
     } mRaytrace;
 
+
+    ref<Buffer> mpMLRaysData;
     ref<ComputePass> mpComputePass;
 };
